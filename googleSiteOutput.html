@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <?!= include("css-googleSiteOutput"); ?>
+  </head>
+  <body class="card-panel" style="padding-left: 12px;">
+    <div class="row" style="margin-left: 14px;">
+      <h3>外賣資料</h3>
+
+       <form action="#">
+          <p>
+            <label for="golden">
+              <input class="with-gap" id="golden" name="group1" type="radio"/>
+              <span>金翠</span>
+            </label>
+          </p>
+          <p>
+            <label for="wafu">
+              <input class="with-gap" id="wafu" name="group1" type="radio"/>
+              <span>華富</span>
+            </label>
+          </p>
+          <p>
+            <label for="wangwai">
+              <input class="with-gap" id="wangwai" name="group1" type="radio"/>
+              <span>雲貴川</span>
+            </label>
+          </p>
+          <p>
+            <label for="waisikgai">
+              <input class="with-gap" id="waisikgai"name="group1" type="radio"/>
+              <span>為食街</span>
+            </label>
+          </p>
+          <p>
+            <label for="yinyau">
+              <input class="with-gap" id="yinyau" name="group1" type="radio"/>
+              <span>賢友</span>
+            </label>
+          </p>
+          <p>
+            <label for="yusushi">
+              <input class="with-gap" id="yusushi" name="group1" type="radio"/>
+              <span>御壽司</span>
+            </label>
+          </p>
+          <p>
+            <label for="others">
+              <input class="with-gap" id="others" name="group1" type="radio"/>
+              <span>其他</span>
+            </label>
+          </p>
+       </form>
+
+      <h5 id="restName"></h5>
+      <h5 id="telNum"></h5>
+      <h5 id="whatsNum"></h5>
+    </div>
+
+    <div class="row" style="margin-left: 14px;">
+      <div class="popup">
+        <button id="btn" class="btn waves-effect waves-light" style="font-family:'Noto Sans HK', serif">
+          獲取資料<i class="material-icons right">file_copy</i></button>
+        <span class="popuptext" id="myPopup">資料已複製至剪貼簿</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <form class="col s12 m8 l9">
+        <div class="row">
+          <div class="input-field col m6 s12 l8">
+            <i class="material-icons prefix">restaurant</i>
+            <textarea id="textBoxForRest" class="materialize-textarea"></textarea>
+            <label for="textBoxForRest" class="active" style="font-size: larger;">餐廳訂單</label>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="row">
+      <form class="col s12 m8 l9">
+        <div class="row">
+          <div class="input-field col m6 s12 l8">
+            <i class="material-icons prefix">people</i>
+            <textarea id="textBoxForUser" class="materialize-textarea"></textarea>
+            <label for="textBoxForUser" class='active' style="font-size: larger;">顧客收據</label>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <?!= include("js-googleSiteOutput");?>
+  </body>
+</html>

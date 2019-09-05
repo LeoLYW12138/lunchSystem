@@ -1,0 +1,68 @@
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+<script>
+    document.getElementById("btn").addEventListener("click", retrieve);
+    function retrieve() {
+      var selectedRest = document.querySelector('input[name="group1"]:checked');
+      if (selectedRest === null) {
+        alert("請選擇一間餐廳");
+      } else {
+        selectedRest = selectedRest.getAttribute('id');
+        google.script.run.withSuccessHandler(useData).main(selectedRest);
+      }
+    }
+
+    function useData(arr) {
+      document.getElementById("textBoxForRest").value = arr[0];
+      document.getElementById("textBoxForUser").value = arr[1];
+      if (arr[2] !== null) {
+        document.getElementById("restName").innerHTML = ("餐廳: " + arr[2]);
+        var phones = arr[3].split("\n");
+        var tel = (phones[0].length == 3)? "" : phones[0].replace("電話：", "").split("\t");
+        var whats = (phones[1].length == 9)? "" : phones[1].replace("WhatsApp:", "").split("\t");
+        function addLinks(item, target) {
+        var style = 'style="margin-right:20px;"';
+        $(target).empty();
+          for (var i = 0; i < item.length; i++) {
+          var number = item[i].replace(" ", "");
+            if (target == "#telNum") {
+              if (i == 0) {
+                $(target).append('<p style="margin-bottom: 5px;"><i class="material-icons prefix">phone</i> 電話: </p>');
+              }
+              $(target).append('<a href="tel:+852'+number +'" ' + style +'>' + item[i] + "</a>");
+            } else {
+              if (i == 0) {
+                $(target).append('<p style="margin-bottom: 5px;"><i class="fab fa-whatsapp fa-1x"></i> WhatsApp: </p>');
+              }
+              $(target).append('<a href="https://wa.me/852'+number+'" ' + style + 'target="_blank"'+'>' + item[i] + "</a>");
+            }
+          }
+        }
+        addLinks(tel, "#telNum");
+        addLinks(whats, "#whatsNum");
+      }
+      document.getElementById("textBoxForRest").select();
+      document.execCommand("copy");
+      document.getSelection().removeAllRanges();
+      M.updateTextFields();
+      $('.materialize-textarea').each(function (index) {
+        M.textareaAutoResize(this);
+      });
+      showPopup();
+    }
+
+    function sleep(ms) {
+      return new Promise(r => setTimeout(r, ms));
+    }
+
+    async function showPopup() {
+      var popup = document.getElementById("myPopup");
+      popup.classList.toggle("show");
+      await sleep(5000);
+      popup.classList.toggle("show");
+    }
+
+    $(document).ready(function() {
+    M.updateTextFields();
+    });
+
+</script>
