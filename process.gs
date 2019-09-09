@@ -13,20 +13,26 @@ function main(selectedRest) {
 
   //get current date
   var d = new Date();
-  var cutOffTime = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 10, 15); //The next day's 10:15
+//  var cutOffTime = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 10, 15); //The next day's 10:15
   var preResetTime = outputSheet.getRange("I1").getValue(); //The today's 16:00
   var resetTime = outputSheet.getRange("I2").getValue();
 
   //reset at 16:00
   if (d > resetTime) {
+    preResetTime = resetTime;
     if (d.toLocaleString().slice(0, 12) == resetTime.toLocaleString().slice(0, 12)) {
-      preResetTime = resetTime;
       resetTime = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 16);
     } else {
-      preResetTime = resetTime;
       resetTime = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 16);
     }
-    lastIndex = lastrow;
+    while (activeSheet.getRange(lastIndex + 1, 1).getValue() != "") {
+      var dataTime = activeSheet.getRange(lastIndex + 1, 1).getValue();
+      if (dataTime > preResetTime) {
+        break;
+      } else {
+        lastIndex++;
+      }
+    }
     outputSheet.getRange("I1").setValue(preResetTime);
     outputSheet.getRange("I2").setValue(resetTime);
     outputSheet.getRange("I3").setValue(lastIndex);
@@ -74,7 +80,7 @@ function main(selectedRest) {
       }
       food += requirement;
 
-      listForUser.push([record[0], food, drink, "$" + subtotal]);
+      listForUser.push([record[0], food, drink, subtotal]);
       listForRest.push([food, drink]);
     }
   }
@@ -92,7 +98,7 @@ function main(selectedRest) {
       subtotal += Number(record[15].substring(1,3)); //add the price of drink to the subtotal
       drink = record[15].slice(3);
 
-      listForUser.push([record[0], food, drink, "$" + subtotal]);
+      listForUser.push([record[0], food, drink, subtotal]);
       listForRest.push([food, drink]);
     }
   }
@@ -138,7 +144,7 @@ function main(selectedRest) {
         cucumber += 1;
       }
 
-      listForUser.push([record[0], soup, food, "$" + subtotal]);
+      listForUser.push([record[0], soup, food, subtotal]);
       listForRest.push([soup, food]);
     }
   }
@@ -161,7 +167,7 @@ function main(selectedRest) {
         food += (spec == "")? "" : spec;
         drink = "";
       }
-      listForUser.push([record[0], food, "$" + subtotal]);
+      listForUser.push([record[0], food, subtotal]);
       listForRest.push([food, drink]);
     }
   }
@@ -200,12 +206,12 @@ function main(selectedRest) {
         drink = record[44];
         subtotal += 1;
       }
-      listForUser.push([record[0], food, drink, "$" + subtotal]);
+      listForUser.push([record[0], food, drink, subtotal]);
       listForRest.push([food, drink]);
     }
   }
 
-  function yusushi(record) {  //45-61 AU-BK
+  function yusushi(record) {  //45-62 AU-BL
     record = record[0];
     if (record[1] == selectedRest) {
       subtotal = 0;
@@ -215,14 +221,14 @@ function main(selectedRest) {
       } else if (record.slice(46, 51).filter(getItem) != '') {
         var sauce = record.slice(46, 51).filter(getItem).toString();
         var index = record.slice(46, 51).indexOf(sauce);
-        food = activeSheet.getRange(1, index + 49).getValue().replace(" [", " ").replace("]", "");
-        food += ' ' + sauce.replace("(黑椒汁)", "");
+        food = activeSheet.getRange(1, index + 49).getValue().substr(9).replace("]", "");
+        food = sauce.replace("(黑椒汁)", "") +' '+ "司華力腸" +' '+ food + "飯";
         subtotal = 37;
       } else if (record.slice(51, 58).filter(getItem) != '') {
         var sauce = record.slice(51, 58).filter(getItem).toString();
         var index = record.slice(51, 58).indexOf(sauce);
-        food = activeSheet.getRange(1, index + 53).getValue().replace(" [", " ").replace("]", "");
-        food += ' ' + sauce.replace("(黑椒汁)", "");
+        food = activeSheet.getRange(1, index + 53).getValue().substr(9).replace("]", "");
+        food = sauce.replace("(黑椒汁)", "") +' '+ food + "飯";
         subtotal = 30;
       } else if (record[58] != '') {
         food = "六選一 " + record[58] +' '+ record[60] +' '+ record[61];
@@ -231,20 +237,25 @@ function main(selectedRest) {
         food = "三選一 " + record[59] +' '+ record[60] +' '+ record[61];
         subtotal = 37;
       }
-      drink = '';
-      listForUser.push([record[0], food, drink, "$" + subtotal]);
-      listForRest.push([food, drink]);
+      if (record[62] != '') {
+        drink = "轉" + record[62];
+        subtotal += 2;
+      } else {
+        drink = "";
+      }
+      listForUser.push([record[0], food, drink, subtotal]);
+      listForRest.push([food.replace(/六選一 |三選一 /, ""), drink]);
     }
   }
 
-  function others(record) {  //62-64  BL-BN
+  function others(record) {  //63-65  BM-BO
     record = record[0];
     if (record[1] == selectedRest) {
       subtotal = 0;
-      food = record[62];
-      drink = record[63];
-      subtotal = record[64];
-      listForUser.push([record[0], food, drink, "$" + subtotal]);
+      food = record[63];
+      drink = record[64];
+      subtotal = record[65];
+      listForUser.push([record[0], food, drink, subtotal]);
       listForRest.push([food, drink]);
     }
   }
@@ -269,15 +280,18 @@ function main(selectedRest) {
 
     var Uoutput = "";
     var Routput = "";
+    var amount = 0;
 
     restName.setValue(selectedRest);
     listForUser.forEach(function outputUserOrder(order) {
       if (yinyauCnt >= 10) {
-        order[3] -= 2;
+        order[3] -= 2; //$2 off for more than 10 lunch
       }
+      amount += order[3];
+      order[3] = "$" + order[3];
       Uoutput = Uoutput + order.toString().replace(/,/g, " ") + "\n";
     });
-    Uoutput = (Uoutput == "")? "無柯打" : Uoutput.trim();
+    Uoutput = (Uoutput == "")? "無柯打" : Uoutput + "總人數: " + listForUser.length + "   總數: $" + amount;
     boxForUser.setValue(Uoutput);
 
     if (selectedRest == "雲貴川") {
@@ -317,7 +331,14 @@ function main(selectedRest) {
           drinkOutput += key;
           drinkOutput += (Drinks[key] == 1)? "\n" : " x" + Drinks[key] + "\n";
       }
-      Routput = (foodOutput == "")? "無柯打" : foodOutput.trim() +"\n"+ drinkOutput.trim();
+
+      if (foodOutput == "") {
+        Routput = "無柯打";
+      } else if (drinkOutput == "") {
+        Routput = foodOutput.trim();
+      } else {
+        Routput = foodOutput.trim() +"\n"+ drinkOutput.trim();
+      }
 
     }
     boxForRest.setValue(Routput);
