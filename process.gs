@@ -4,11 +4,18 @@ function main(selectedRest) {
   //get the current active sheet
   var activeSheet = ss.getSheetByName("表格回應 1");
   var outputSheet = ss.getSheetByName("工作表1");
+  if (!outputSheet) {
+    ss.insertSheet('工作表1');
+    outputSheet = ss.getSheetByName("工作表1");
+  }
+  if (outputSheet.getRange("I4").isBlank()) {
+    init(ss);
+  }
   var lastrow = activeSheet.getLastRow();
   var lastcol = activeSheet.getLastColumn();
   var lastIndex = outputSheet.getRange("I3").getValue();
   var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jan", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  var rests = {"golden":"金翠", "wafu":"華富", "wangwai":"雲貴川", "waisikgai":"為食街", "yinyau":"賢友", "yusushi":"御壽司", "others":"其他"};
+  var rests = {"golden":"金翠", "wafu":"華富", "wangwai":"雲貴川", "waisikgai":"為食街", "yinyau":"賢友", "yusushi":"御壽司", "gagahou":"家家好", "others":"其他"};
   selectedRest = rests[selectedRest];
 
   //get current date
@@ -56,27 +63,27 @@ function main(selectedRest) {
     return item != "";
   }
 
-  function golden(record) {  //2-12 D-N
+  function golden(record) {  //5-15 G-Q
     record = record[0];
     if (record[1] == selectedRest) {
       subtotal = 30;
-      if (record[2] == '') {
-        food = record[3].replace(",", "") + "飯";
-        var requirement = " " + record[4];
+      if (record[5] == '') {
+        food = record[6].replace(",", "") + "飯";
+        var requirement = " " + record[7];
       } else {
-        food = record[2];
+        food = record[5];
         var requirement = "";
       }
-      var index = record.slice(5, 13).indexOf(record.slice(5, 13).filter(getItem).toString());
+      var index = record.slice(5, 13).indexOf(record.slice(8, 16).filter(getItem).toString());
       var drinks = ["檸水", "檸茶", "奶茶", "華田", "好立克", "咖啡", "菜蜜", "檸蜜"];
-      if (record[index + 5].search("熱") != -1) {
-        record[index + 5] = record[index + 5].slice(1).replace(", ", "");
-        drink = "熱" + drinks[index] +' '+ record[index + 5].split(", ").toString().replace(/,/g, " ");
-      } else if (record[index +5].search("凍") != -1) {
-        record[index + 5] = record[index + 5].slice(1).replace(", ", "");
-        drink = "凍" + drinks[index] +' '+ record[index + 5].split(", ").toString().replace(/,/g, " ");
+      if (record[index + 8].search("熱") != -1) {
+        record[index + 8] = record[index + 8].slice(1).replace(", ", "");
+        drink = "熱" + drinks[index] +' '+ record[index + 8].split(", ").toString().replace(/,/g, " ");
+      } else if (record[index + 8].search("凍") != -1) {
+        record[index + 8] = record[index + 8].slice(1).replace(", ", "");
+        drink = "凍" + drinks[index] +' '+ record[index + 8].split(", ").toString().replace(/,/g, " ");
       } else {
-        drink = drinks[index] +' '+ record[index + 5].split(", ").toString().replace(/,/g, " ");
+        drink = drinks[index] +' '+ record[index + 8].split(", ").toString().replace(/,/g, " ");
       }
       food += requirement;
 
@@ -85,18 +92,18 @@ function main(selectedRest) {
     }
   }
 
-  function wafu(record) {  //13-15 O-Q
+  function wafu(record) {  //16-18 R-T
     record = record[0];
     if (record[1] == selectedRest) {
       subtotal = 27;
-      if (record[14] == '') {
-        food = record[13].toString();
+      if (record[17] == '') {
+        food = record[16].toString();
       } else {
-        food = record[14].toString();
+        food = record[17].toString();
         subtotal += 2;
       }
-      subtotal += Number(record[15].substring(1,3)); //add the price of drink to the subtotal
-      drink = record[15].slice(3);
+      subtotal += Number(record[18].substring(1,3)); //add the price of drink to the subtotal
+      drink = record[18].slice(3);
 
       listForUser.push([record[0], food, drink, subtotal]);
       listForRest.push([food, drink]);
@@ -105,30 +112,30 @@ function main(selectedRest) {
 
   var cucumber = 0;
 
-  function wangwai(record) {  //16-25 R-AA
+  function wangwai(record) {  //19-28 U-AD
     record = record[0];
     if (record[1] == selectedRest) {
       subtotal = 0;
-      var soupSpec = record.slice(16, 21).filter(getItem).toString();
-      var index = record.slice(16, 21).indexOf(soupSpec);
+      var soupSpec = record.slice(18, 24).filter(getItem).toString();
+      var index = record.slice(19, 24).indexOf(soupSpec);
 
-      if (record[21].search("轉薯粉") != -1) {
-        record[21] = record[21].replace("轉薯粉", "");
-        record[21] = record[21].slice(0, record[21].length - 2);
-        var soup = activeSheet.getRange(1, index + 18).getValue().substring(8, 10) + "薯粉" +' '+ soupSpec;
-        soup += (record[21] == "") ? "" : ' ' + record[21];
-        if (record[20] == "") {
+      if (record[24].search("轉薯粉") != -1) {
+        record[24] = record[24].replace("轉薯粉", "");
+        record[24] = record[24].slice(0, record[24].length - 2);
+        var soup = activeSheet.getRange(1, index + 21).getValue().substring(8, 10) + "薯粉" +' '+ soupSpec;
+        soup += (record[24] == "") ? "" : ' ' + record[24];
+        if (record[23] == "") {
           subtotal += 3;
         }
       } else {
-        record[21] = record[21].replace(/, /g, " ");
-        var soup = activeSheet.getRange(1, index + 18).getValue().substring(8, 12) +' '+ soupSpec;
-        soup += (record[21] == "") ? "" : ' ' + record[21];
+        record[24] = record[24].replace(/, /g, " ");
+        var soup = activeSheet.getRange(1, index + 21).getValue().substring(8, 12) +' '+ soupSpec;
+        soup += (record[24] == "") ? "" : ' ' + record[24];
       }
-      subtotal += Number(activeSheet.getRange(1, index + 18).getValue().substring(5, 7)); //add the price of soup to the subtotal
-      var ingred_5 = record[22].replace(/ /g, "").split(",");
-      var ingred_6 = record[23].replace(/ /g, "").split(",");
-      var ingred_8 = record[24].replace(/ /g, "").split(",");
+      subtotal += Number(activeSheet.getRange(1, index + 21).getValue().substring(5, 7)); //add the price of soup to the subtotal
+      var ingred_5 = record[25].replace(/ /g, "").split(",");
+      var ingred_6 = record[26].replace(/ /g, "").split(",");
+      var ingred_8 = record[27].replace(/ /g, "").split(",");
       function getLength(arr) {
         if (arr[0] == "") {
           return 0;
@@ -140,7 +147,7 @@ function main(selectedRest) {
       food = ingred_5.toString();
       food += (getLength(ingred_5) > 0)? " " + ingred_6.toString() : ingred_6.toString();
       food += (getLength(ingred_6) > 0)? " " + ingred_8.toString() : ingred_8.toString();
-      if (record[25] == 1) {
+      if (record[28] == 1) {
         cucumber += 1;
       }
 
@@ -149,61 +156,61 @@ function main(selectedRest) {
     }
   }
 
-  function waisikgai(record) {  //26-29  AB-AE
+  function waisikgai(record) {  //29-32  AE-AH
     record = record[0];
     if (record[1] == selectedRest) {
       subtotal = 30;
-      if (record[27] == "") {
-        food = record[26];
+      if (record[30] == "") {
+        food = record[29];
         drink = "";
 
       } else {
-        var spicy = record[27];
-        var stick = record[28].split(", ").map(function func(item) {return item.slice(0, 3)});
-        var spec = record[29].replace(/, /g, " ");
+        var spicy = record[30];
+        var stick = record[31].split(", ").map(function func(item) {return item.slice(0, 3)});
+        var spec = record[32].replace(/, /g, " ");
 
         food = "涼伴麵" +' '+ spicy +' ';
         food += stick.toString().replace(/,/g, "");
         food += (spec == "")? "" : spec;
         drink = "";
       }
-      listForUser.push([record[0], food, subtotal]);
+      listForUser.push([record[0], food, drink, subtotal]);
       listForRest.push([food, drink]);
     }
   }
 
   var yinyauCnt = 0;
 
-  function yinyau(record) {  //30-44 AF-AT
+  function yinyau(record) {  //33-46 AI-AV
     record = record[0];
     if (record[1] == selectedRest) {
       yinyauCnt += 1;
       subtotal = 28;
-      if (record[30] != '') {
-        food = record[30] + record[31];
-      } else if (record[32] != '') {
-        food = record[32];
+      if (record[32] != '') {
+        food = record[32] + record[33];
+      } else if (record[34] != '') {
+        food = record[34];
       } else {
-        var index = record.slice(33, 36).indexOf(record.slice(33, 36).filter(getItem).toString());
+        var index = record.slice(35, 38).indexOf(record.slice(35, 38).filter(getItem).toString());
         var Foods = ["41 炸蝦卷雞翼", "42 炸魚腐叉焼", "43 餐肉腸仔"];
-        food = Foods[index] + record[33 + index];
+        food = Foods[index] + record[35 + index];
       }
-      if (record.slice(36, 45).toString().replace(/,/g, "") == "") {
+      if (record.slice(38, 47).toString().replace(/,/g, "") == "") {
         drink = "";
-      } else if (record[44] == "") {
-        var index = record.slice(36, 44).indexOf(record.slice(36, 44).filter(getItem).toString());
+      } else if (record[46] == "") {
+        var index = record.slice(38, 47).indexOf(record.slice(38, 47).filter(getItem).toString());
         var drinks = ["檸水", "檸茶", "奶茶", "華田", "好立克", "咖啡", "菜蜜"];
-        if (record[index + 36].search("熱") != -1) {
-          record[index + 36] = record[index + 36].slice(1).replace(", ", "");
-          drink = "熱" + drinks[index] +' '+ record[index + 36].split(", ").toString().replace(/,/g, " ");
-        } else if (record[index + 36].search("凍") != -1) {
-          record[index + 36] = record[index + 36].slice(1).replace(", ", "");
-          drink = "凍" + drinks[index] +' '+ record[index + 36].split(", ").toString().replace(/,/g, " ");
+        if (record[index + 38].search("熱") != -1) {
+          record[index + 38] = record[index + 38].slice(1).replace(", ", "");
+          drink = "熱" + drinks[index] +' '+ record[index + 38].split(", ").toString().replace(/,/g, " ");
+        } else if (record[index + 38].search("凍") != -1) {
+          record[index + 38] = record[index + 38].slice(1).replace(", ", "");
+          drink = "凍" + drinks[index] +' '+ record[index + 38].split(", ").toString().replace(/,/g, " ");
         } else {
-          drink = drinks[index] +' '+ record[index + 36].split(", ").toString().replace(/,/g, " ");
+          drink = drinks[index] +' '+ record[index + 38].split(", ").toString().replace(/,/g, " ");
         }
       } else {
-        drink = record[44];
+        drink = record[46];
         subtotal += 1;
       }
       listForUser.push([record[0], food, drink, subtotal]);
@@ -211,34 +218,34 @@ function main(selectedRest) {
     }
   }
 
-  function yusushi(record) {  //45-62 AU-BL
+  function yusushi(record) {  //47-64 AW-BN
     record = record[0];
     if (record[1] == selectedRest) {
       subtotal = 0;
-      if (record[45] != '') {
-        food = record[45];
+      if (record[47] != '') {
+        food = record[47];
         subtotal = (food == "原條浦燒鰻魚飯")? 37 : 30;
-      } else if (record.slice(46, 51).filter(getItem) != '') {
-        var sauce = record.slice(46, 51).filter(getItem).toString();
-        var index = record.slice(46, 51).indexOf(sauce);
-        food = activeSheet.getRange(1, index + 49).getValue().substr(9).replace("]", "");
+      } else if (record.slice(48, 53).filter(getItem) != '') {
+        var sauce = record.slice(48, 53).filter(getItem).toString();
+        var index = record.slice(48, 53).indexOf(sauce);
+        food = activeSheet.getRange(1, index + 51).getValue().substr(9).replace("]", "");
         food = sauce.replace("(黑椒汁)", "") +' '+ "司華力腸" +' '+ food + "飯";
         subtotal = 37;
-      } else if (record.slice(51, 58).filter(getItem) != '') {
-        var sauce = record.slice(51, 58).filter(getItem).toString();
-        var index = record.slice(51, 58).indexOf(sauce);
-        food = activeSheet.getRange(1, index + 53).getValue().substr(9).replace("]", "");
+      } else if (record.slice(53, 60).filter(getItem) != '') {
+        var sauce = record.slice(53, 60).filter(getItem).toString();
+        var index = record.slice(53, 60).indexOf(sauce);
+        food = activeSheet.getRange(1, index + 55).getValue().substr(9).replace("]", "");
         food = sauce.replace("(黑椒汁)", "") +' '+ food + "飯";
         subtotal = 30;
-      } else if (record[58] != '') {
-        food = "六選一 " + record[58] +' '+ record[60] +' '+ record[61];
+      } else if (record[60] != '') {
+        food = "六選一 " + record[60] +' '+ record[62] +' '+ record[63];
         subtotal = 36;
       } else {
-        food = "三選一 " + record[59] +' '+ record[60] +' '+ record[61];
+        food = "三選一 " + record[61] +' '+ record[62] +' '+ record[63];
         subtotal = 37;
       }
-      if (record[62] != '') {
-        drink = "轉" + record[62];
+      if (record[64] != '') {
+        drink = "轉" + record[64];
         subtotal += 2;
       } else {
         drink = "";
@@ -248,13 +255,31 @@ function main(selectedRest) {
     }
   }
 
-  function others(record) {  //63-65  BM-BO
+  var gagaCnt = 0;
+  function gagahou(record) {  //65-66 BO-BP
+    record = record[0];
+    if (record[1] == selectedRest) {
+      gagaCnt += 1;
+      subtotal = 27;
+      food = record[65];
+      if (record[66] != "") {
+        drink = record[66];
+        subtotal += 3;
+      } else {
+        drink = "";
+      }
+      listForUser.push([record[0], food, drink, subtotal]);
+      listForRest.push([food, drink]);
+    }
+  }
+
+  function others(record) {  //2-4  D-F
     record = record[0];
     if (record[1] == selectedRest) {
       subtotal = 0;
-      food = record[63];
-      drink = record[64];
-      subtotal = record[65];
+      food = record[2];
+      drink = record[3];
+      subtotal = record[4];
       listForUser.push([record[0], food, drink, subtotal]);
       listForRest.push([food, drink]);
     }
@@ -274,6 +299,7 @@ function main(selectedRest) {
         case "為食街": restaurant = waisikgai; break;
         case "賢友": restaurant = yinyau; break;
         case "御壽司": restaurant = yusushi; break;
+        case "家家好": restaurant = gagahou; break;
       default: restaurant = others;
     }
     records.forEach(restaurant);
@@ -284,7 +310,7 @@ function main(selectedRest) {
 
     restName.setValue(selectedRest);
     listForUser.forEach(function outputUserOrder(order) {
-      if (yinyauCnt >= 10) {
+      if (yinyauCnt >= 10 || gagaCnt >= 10) {
         order[3] -= 2; //$2 off for more than 10 lunch
       }
       amount += order[3];
