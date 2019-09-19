@@ -1,4 +1,4 @@
-function main(selectedRest) {
+ function main(selectedRest) {
   var url = "https://docs.google.com/spreadsheets/d/1FGh5c-be08F-fpYhwz4U370Hdq7sRa1sn6LRBFNpoME/edit#gid=1661786259";
   var ss = SpreadsheetApp.openByUrl(url);
   //get the current active sheet
@@ -133,9 +133,9 @@ function main(selectedRest) {
         soup += (record[24] == "") ? "" : ' ' + record[24];
       }
       subtotal += Number(activeSheet.getRange(1, index + 21).getValue().substring(5, 7)); //add the price of soup to the subtotal
-      var ingred_5 = record[25].replace(/ /g, "").split(",");
-      var ingred_6 = record[26].replace(/ /g, "").split(",");
-      var ingred_8 = record[27].replace(/ /g, "").split(",");
+//      var ingred_5 = record[25].replace(/ /g, "").split(","); outdated!
+      var ingred_6 = record[25].replace(/ /g, "").split(",");
+      var ingred_10 = record[27].replace(/ /g, "").split(",");
       function getLength(arr) {
         if (arr[0] == "") {
           return 0;
@@ -143,10 +143,9 @@ function main(selectedRest) {
           return arr.length;
         }
       }
-      subtotal = subtotal + 5 * getLength(ingred_5) + 6 * getLength(ingred_6) + 8 * getLength(ingred_8);
-      food = ingred_5.toString();
-      food += (getLength(ingred_5) > 0)? " " + ingred_6.toString() : ingred_6.toString();
-      food += (getLength(ingred_6) > 0)? " " + ingred_8.toString() : ingred_8.toString();
+      subtotal = subtotal + 6 * getLength(ingred_6) + 10 * getLength(ingred_10);
+      food = ingred_6.toString();
+      food += (getLength(ingred_6) > 0)? " " + ingred_10.toString() : ingred_10.toString();
       if (record[28] == 1) {
         cucumber += 1;
       }
@@ -317,12 +316,14 @@ function main(selectedRest) {
       order[3] = "$" + order[3];
       Uoutput = Uoutput + order.toString().replace(/,/g, " ") + "\n";
     });
-    Uoutput = (Uoutput == "")? "無柯打" : Uoutput + "總人數: " + listForUser.length + "   總數: $" + amount;
+    Uoutput = (Uoutput == "")? "無柯打" : Uoutput.replace("\n", "");
     boxForUser.setValue(Uoutput);
 
+    var i = 0;
     if (selectedRest == "雲貴川") {
       listForRest.forEach(function outputRestOrder(order) {
-        Routput = Routput + order.toString().replace(/,/g, " ") + "\n";
+        i++;
+        Routput = Routput + i + ". " + order.toString().replace(/,/g, " ") + "\n";
       });
       if (Routput == "") {
         Routput = "無柯打";
@@ -378,5 +379,5 @@ function main(selectedRest) {
     restName.setValue("");
   }
   Logger.log("\n%s \n%s \n%s", Routput, Uoutput, getPhone(selectedRest));
-  return [Routput, Uoutput, selectedRest, getPhone(selectedRest)];
+  return [Routput, Uoutput, selectedRest, getPhone(selectedRest), listForUser.length, amount];
 }

@@ -14,6 +14,8 @@
     function useData(arr) {
       document.getElementById("textBoxForRest").value = arr[0];
       document.getElementById("textBoxForUser").value = arr[1];
+      document.getElementById("totalppl").innerHTML = "總人數: " + arr[4];
+      document.getElementById("amount").innerHTML = "總金額: $" + arr[5];
       if (arr[2] !== null) {
         document.getElementById("restName").innerHTML = ("餐廳: " + arr[2]);
         var phones = arr[3].split("\n");
