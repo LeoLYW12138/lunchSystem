@@ -4,6 +4,7 @@
   //get the current active sheet
   var activeSheet = ss.getSheetByName("表格回應 1");
   var outputSheet = ss.getSheetByName("工作表1");
+  //insert a new sheet if it does not exist
   if (!outputSheet) {
     ss.insertSheet('工作表1');
     outputSheet = ss.getSheetByName("工作表1");
@@ -21,7 +22,7 @@
   //get current date
   var d = new Date();
 //  var cutOffTime = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 10, 15); //The next day's 10:15
-  var preResetTime = outputSheet.getRange("I1").getValue(); //The today's 16:00
+  var preResetTime = outputSheet.getRange("I1").getValue(); //Today's 16:00
   var resetTime = outputSheet.getRange("I2").getValue();
 
   //reset at 16:00
@@ -32,8 +33,9 @@
     } else {
       resetTime = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 16);
     }
+    //get the index of last record
     while (activeSheet.getRange(lastIndex + 1, 1).getValue() != "") {
-      var dataTime = activeSheet.getRange(lastIndex + 1, 1).getValue();
+      var dataTime = activeSheet.getRange(lastIndex + 1, 1).getValue();//get the timestamp of that record
       if (dataTime > preResetTime) {
         break;
       } else {
@@ -63,6 +65,22 @@
     return item != "";
   }
 
+  function getDrink(start, end, record) {
+    var temp;
+    var index = record.slice(start, end).indexOf(record.slice(start, end).filter(getItem).toString());
+    var drinks = ["檸水", "檸茶", "奶茶", "華田", "好立克", "咖啡", "菜蜜", "檸蜜"];
+    if (record[index + start].search("熱") != -1) {
+      record[index + start] = record[index + start].slice(1).replace(", ", "");
+      temp = "熱" + drinks[index] +' '+ record[index + start].split(", ").toString().replace(/,/g, " ");
+    } else if (record[index + start].search("凍") != -1) {
+      record[index + start] = record[index + start].slice(1).replace(", ", "");
+      temp = "凍" + drinks[index] +' '+ record[index + start].split(", ").toString().replace(/,/g, " ");
+    } else {
+      temp = drinks[index] +' '+ record[index + start].split(", ").toString().replace(/,/g, " ");
+    }
+    return temp;
+  }
+
   function golden(record) {  //5-15 G-Q
     record = record[0];
     if (record[1] == selectedRest) {
@@ -74,19 +92,8 @@
         food = record[5];
         var requirement = "";
       }
-      var index = record.slice(5, 13).indexOf(record.slice(8, 16).filter(getItem).toString());
-      var drinks = ["檸水", "檸茶", "奶茶", "華田", "好立克", "咖啡", "菜蜜", "檸蜜"];
-      if (record[index + 8].search("熱") != -1) {
-        record[index + 8] = record[index + 8].slice(1).replace(", ", "");
-        drink = "熱" + drinks[index] +' '+ record[index + 8].split(", ").toString().replace(/,/g, " ");
-      } else if (record[index + 8].search("凍") != -1) {
-        record[index + 8] = record[index + 8].slice(1).replace(", ", "");
-        drink = "凍" + drinks[index] +' '+ record[index + 8].split(", ").toString().replace(/,/g, " ");
-      } else {
-        drink = drinks[index] +' '+ record[index + 8].split(", ").toString().replace(/,/g, " ");
-      }
       food += requirement;
-
+      drink = getDrink(8, 16, record);
       listForUser.push([record[0], food, drink, subtotal]);
       listForRest.push([food, drink]);
     }
@@ -197,17 +204,7 @@
       if (record.slice(38, 47).toString().replace(/,/g, "") == "") {
         drink = "";
       } else if (record[46] == "") {
-        var index = record.slice(38, 47).indexOf(record.slice(38, 47).filter(getItem).toString());
-        var drinks = ["檸水", "檸茶", "奶茶", "華田", "好立克", "咖啡", "菜蜜"];
-        if (record[index + 38].search("熱") != -1) {
-          record[index + 38] = record[index + 38].slice(1).replace(", ", "");
-          drink = "熱" + drinks[index] +' '+ record[index + 38].split(", ").toString().replace(/,/g, " ");
-        } else if (record[index + 38].search("凍") != -1) {
-          record[index + 38] = record[index + 38].slice(1).replace(", ", "");
-          drink = "凍" + drinks[index] +' '+ record[index + 38].split(", ").toString().replace(/,/g, " ");
-        } else {
-          drink = drinks[index] +' '+ record[index + 38].split(", ").toString().replace(/,/g, " ");
-        }
+        drink = getDrink(38, 47, record);
       } else {
         drink = record[46];
         subtotal += 1;
@@ -224,16 +221,16 @@
       if (record[47] != '') {
         food = record[47];
         subtotal = (food == "原條浦燒鰻魚飯")? 37 : 30;
-      } else if (record.slice(48, 53).filter(getItem) != '') {
+      } else if (record.slice(48, 53).filter(getItem) != '') { //司華力腸餐
         var sauce = record.slice(48, 53).filter(getItem).toString();
         var index = record.slice(48, 53).indexOf(sauce);
-        food = activeSheet.getRange(1, index + 51).getValue().substr(9).replace("]", "");
+        food = activeSheet.getRange(1, index + 50).getValue().substr(9).replace("]", "");
         food = sauce.replace("(黑椒汁)", "") +' '+ "司華力腸" +' '+ food + "飯";
         subtotal = 37;
-      } else if (record.slice(53, 60).filter(getItem) != '') {
+      } else if (record.slice(53, 60).filter(getItem) != '') { //大滿足餐
         var sauce = record.slice(53, 60).filter(getItem).toString();
         var index = record.slice(53, 60).indexOf(sauce);
-        food = activeSheet.getRange(1, index + 55).getValue().substr(9).replace("]", "");
+        food = activeSheet.getRange(1, index + 55).getValue().substr(5).replace("]", "");
         food = sauce.replace("(黑椒汁)", "") +' '+ food + "飯";
         subtotal = 30;
       } else if (record[60] != '') {
@@ -316,7 +313,7 @@
       order[3] = "$" + order[3];
       Uoutput = Uoutput + order.toString().replace(/,/g, " ") + "\n";
     });
-    Uoutput = (Uoutput == "")? "無柯打" : Uoutput.replace("\n", "");
+    Uoutput = (Uoutput == "")? "無柯打" : Uoutput.slice(0, -1);
     boxForUser.setValue(Uoutput);
 
     var i = 0;
