@@ -16,7 +16,7 @@
   var lastcol = activeSheet.getLastColumn();
   var lastIndex = outputSheet.getRange("I3").getValue();
   var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jan", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  var rests = {"golden":"金翠", "wafu":"華富", "wangwai":"雲貴川", "waisikgai":"為食街", "yinyau":"賢友", "yusushi":"御壽司", "gagahou":"家家好", "others":"其他"};
+   var rests = {"golden":"金翠", "wafu":"華富", "wangwai":"雲貴川", "waisikgai":"為食街", "yinyau":"賢友", "yusushi":"御壽司", "gagahou":"家家好", "jukgajong":"粥家莊", "others":"其他"};
   selectedRest = rests[selectedRest];
 
   //get current date
@@ -269,6 +269,42 @@
     }
   }
 
+   function jukgajong(record) {  //67-75 BQ-BY
+     record = record[0];
+     if (record[1] == selectedRest) {
+       subtotal = 0;
+       food = "";
+       drink = "";
+       for (var i = 67; i < 70; i++) {
+         if (record[i] != "") {
+           food += "單點" + record[i].toString().substr(4).replace(/,/g, "") + " ";
+           subtotal += Number(record[i].substring(1, 3));
+         }
+       }
+       if (record[70] != "") {
+         drink = record[70].toString().substr(4).replace(/,/g, "");
+         subtotal += Number(record[70].substring(1, 3));
+       }
+       if (record[71] != "") {
+         food += record[71].substr(4) + "+";
+         subtotal += Number(record[71].substring(1, 3));
+         var ingred = record.slice(72, 76).filter(getItem).toString();
+         food += ingred;
+         switch (record.slice(72, 76).indexOf(ingred)) {
+             case 0: subtotal += 0; break;
+             case 1: subtotal += 1; break;
+             case 2: subtotal += 6; break;
+             case 3: subtotal += 9; break;
+           default: break;
+         }
+
+       }
+       listForUser.push([record[0], food, drink, subtotal]);
+       listForRest.push([food, drink]);
+     }
+   }
+
+
   function others(record) {  //2-4  D-F
     record = record[0];
     if (record[1] == selectedRest) {
@@ -287,7 +323,6 @@
 
   if (records.length != 0) {
     var restaurant;
-
     switch(selectedRest) {
         case "金翠": restaurant = golden; break;
         case "華富": restaurant = wafu; break;
@@ -296,6 +331,7 @@
         case "賢友": restaurant = yinyau; break;
         case "御壽司": restaurant = yusushi; break;
         case "家家好": restaurant = gagahou; break;
+        case "粥家莊": restaurant = jukgajong; break;
       default: restaurant = others;
     }
     records.forEach(restaurant);

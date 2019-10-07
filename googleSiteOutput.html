@@ -2,65 +2,33 @@
 <html>
   <head>
     <base target="_top">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <?!= include("css-googleSiteOutput"); ?>
   </head>
   <body class="card-panel" style="padding-left: 12px;">
     <div class="row" style="margin-left: 14px;">
       <h3>外賣資料</h3>
-
-       <form action="#">
-          <p>
-            <label for="golden">
-              <input class="with-gap" id="golden" name="group1" type="radio"/>
-              <span>金翠</span>
-            </label>
-          </p>
-          <p>
-            <label for="wafu">
-              <input class="with-gap" id="wafu" name="group1" type="radio"/>
-              <span>華富</span>
-            </label>
-          </p>
-          <p>
-            <label for="wangwai">
-              <input class="with-gap" id="wangwai" name="group1" type="radio"/>
-              <span>雲貴川</span>
-            </label>
-          </p>
-          <p>
-            <label for="waisikgai">
-              <input class="with-gap" id="waisikgai"name="group1" type="radio"/>
-              <span>為食街</span>
-            </label>
-          </p>
-          <p>
-            <label for="yinyau">
-              <input class="with-gap" id="yinyau" name="group1" type="radio"/>
-              <span>賢友</span>
-            </label>
-          </p>
-          <p>
-            <label for="yusushi">
-              <input class="with-gap" id="yusushi" name="group1" type="radio"/>
-              <span>御壽司</span>
-            </label>
-          </p>
-          <p>
-            <label for="gagahou">
-              <input class="with-gap" id="gagahou" name="group1" type="radio"/>
-              <span>家家好</span>
-            </label>
-          </p>
-          <p>
-            <label for="others">
-              <input class="with-gap" id="others" name="group1" type="radio"/>
-              <span>其他</span>
-            </label>
-          </p>
-       </form>
-
+    </div>
+    <div class="row" style="margin-left: 5px; margin-bottom: 5px">
+      <div class="input-field col l2 m2 s6">
+        <p style="margin: 0; font-size: 16px">所選餐廳</p>
+        <select id="selectRest" class="browser-default">
+          <option value="" disabled selected>選擇一間餐廳</option>
+          <option value="golden">金翠</option>
+          <option value="wafu">華富</option>
+          <option value="wangwai">雲貴川</option>
+          <option value="waisikgai">為食街</option>
+          <option value="yinyau">賢友</option>
+          <option value="yusushi">御壽司</option>
+          <option value="gagahou">家家好</option>
+          <option value="jukgajong">粥家莊</option>
+          <option value="others">其他</option>
+        </select>
+        <!--<label>所選餐廳</label>-->
+      </div>
+    </div>
+    <div class="row" style="margin-left: 14px;">
       <h5 id="restName"></h5>
       <h5 id="telNum"></h5>
       <h5 id="whatsNum"></h5>
@@ -68,7 +36,7 @@
 
     <div class="row" style="margin-left: 14px;">
       <div class="popup">
-        <button id="btn" class="btn waves-effect waves-light" style="font-family:'Noto Sans HK', serif">
+        <button id="btn" class="btn waves-effect waves-light" style="font-family:'Noto Sans HK', serif" data-clipboard-target="#textBoxForRest">
           獲取資料<i class="material-icons right">file_copy</i></button>
         <span class="popuptext" id="myPopup">資料已複製至剪貼簿</span>
       </div>

@@ -1,12 +1,16 @@
-<script src = "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
 <script>
+    $(document).ready(function(){
+      $('select').formSelect();
+    });
     document.getElementById("btn").addEventListener("click", retrieve);
     function retrieve() {
-      var selectedRest = document.querySelector('input[name="group1"]:checked');
+//      var selectedRest = document.querySelector('input[name="group1"]:checked');
+      var selectedRest = $('select#selectRest').val();
       if (selectedRest === null) {
         alert("請選擇一間餐廳");
       } else {
-        selectedRest = selectedRest.getAttribute('id');
         google.script.run.withSuccessHandler(useData).main(selectedRest);
       }
     }
@@ -15,7 +19,7 @@
       document.getElementById("textBoxForRest").value = arr[0];
       document.getElementById("textBoxForUser").value = arr[1];
       document.getElementById("totalppl").innerHTML = "總人數: " + arr[4];
-      document.getElementById("amount").innerHTML = "總金額: $" + arr[5];
+      document.getElementById("amount").innerHTML = "總金額: $" + ((arr[5] === null)? 0 : arr[5]);
       if (arr[2] !== null) {
         document.getElementById("restName").innerHTML = ("餐廳: " + arr[2]);
         var phones = arr[3].split("\n");
@@ -42,14 +46,25 @@
         addLinks(tel, "#telNum");
         addLinks(whats, "#whatsNum");
       }
-      document.getElementById("textBoxForRest").select();
-      document.execCommand("copy");
-      document.getSelection().removeAllRanges();
+
+      var clipboard = new ClipboardJS('#btn');
+      clipboard.on('success', function(e) {
+//      console.info('Action:', e.action);
+      console.info('Text:', e.text);
+//      console.info('Trigger:', e.trigger);
+      showPopup();
+
+      e.clearSelection();
+      });
+
+      clipboard.on('error', function(e) {
+      console.error('Action:', e.action);
+      console.error('Trigger:', e.trigger);
+      });
       M.updateTextFields();
       $('.materialize-textarea').each(function (index) {
         M.textareaAutoResize(this);
       });
-      showPopup();
     }
 
     function sleep(ms) {
