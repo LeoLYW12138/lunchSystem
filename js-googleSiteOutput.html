@@ -1,12 +1,21 @@
 <script src = "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
 <script>
+    if (navigator.userAgent.match(/iPad|iPhone|iPod|Android/i) != null) {
+      var select = document.getElementById("selectRest");
+      var option = document.createElement("option");
+      select.setAttribute("class", "browser-default");
+      option.text = "選擇一間餐廳";
+      option.setAttribute("disabled", true);
+      option.setAttribute("selected", true);
+      option.setAttribute("hidden", true);
+      select.add(option, 0); //insert to the top
+    }
     $(document).ready(function(){
       $('select').formSelect();
     });
     document.getElementById("btn").addEventListener("click", retrieve);
     function retrieve() {
-//      var selectedRest = document.querySelector('input[name="group1"]:checked');
       var selectedRest = $('select#selectRest').val();
       if (selectedRest === null) {
         alert("請選擇一間餐廳");

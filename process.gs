@@ -220,7 +220,7 @@
       subtotal = 0;
       if (record[47] != '') {
         food = record[47];
-        subtotal = (food == "原條浦燒鰻魚飯")? 37 : 30;
+        subtotal = (food == "原條蒲燒鰻魚飯")? 37 : 30;
       } else if (record.slice(48, 53).filter(getItem) != '') { //司華力腸餐
         var sauce = record.slice(48, 53).filter(getItem).toString();
         var index = record.slice(48, 53).indexOf(sauce);
@@ -275,15 +275,24 @@
        subtotal = 0;
        food = "";
        drink = "";
+       function mulFood(x) {
+         var temp = "";
+         for (var j = 0; j < x.length; j++) {
+           subtotal += Number(x[j].substring(1, 3));
+           temp += x[j].substring(4) + " ";
+         }
+         return temp;
+       }
+
        for (var i = 67; i < 70; i++) {
          if (record[i] != "") {
-           food += "單點" + record[i].toString().substr(4).replace(/,/g, "") + " ";
-           subtotal += Number(record[i].substring(1, 3));
+           var items = record[i].toString().split(", ");
+           food += mulFood(items);
          }
        }
        if (record[70] != "") {
-         drink = record[70].toString().substr(4).replace(/,/g, "");
-         subtotal += Number(record[70].substring(1, 3));
+         var items = record[70].toString().split(", ");
+         drink += mulFood(items);
        }
        if (record[71] != "") {
          food += record[71].substr(4) + "+";
