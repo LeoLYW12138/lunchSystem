@@ -16,7 +16,7 @@
   var lastcol = activeSheet.getLastColumn();
   var lastIndex = outputSheet.getRange("I3").getValue();
   var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jan", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-   var rests = {"golden":"金翠", "wafu":"華富", "wangwai":"雲貴川", "waisikgai":"為食街", "yinyau":"賢友", "yusushi":"御壽司", "gagahou":"家家好", "jukgajong":"粥家莊", "others":"其他"};
+  var rests = {"golden":"金翠", "wafu":"華富", "wangwai":"雲貴川", "waisikgai":"為食街", "yinyau":"賢友", "yusushi":"御壽司", "gagahou":"家家好", "jukgajong":"粥家莊", "yatsin":"一線軒","others":"其他"};
   selectedRest = rests[selectedRest];
 
   //get current date
@@ -63,6 +63,14 @@
 
   function getItem(item) {
     return item != "";
+  }
+
+  function getLength(arr) {
+    if (arr[0] == "") {
+      return 0;
+    } else {
+      return arr.length;
+    }
   }
 
   function getDrink(start, end, record) {
@@ -143,13 +151,6 @@
 //      var ingred_5 = record[25].replace(/ /g, "").split(","); outdated!
       var ingred_6 = record[25].replace(/ /g, "").split(",");
       var ingred_10 = record[27].replace(/ /g, "").split(",");
-      function getLength(arr) {
-        if (arr[0] == "") {
-          return 0;
-        } else {
-          return arr.length;
-        }
-      }
       subtotal = subtotal + 6 * getLength(ingred_6) + 10 * getLength(ingred_10);
       food = ingred_6.toString();
       food += (getLength(ingred_6) > 0)? " " + ingred_10.toString() : ingred_10.toString();
@@ -269,49 +270,78 @@
     }
   }
 
-   function jukgajong(record) {  //67-75 BQ-BY
-     record = record[0];
-     if (record[1] == selectedRest) {
-       subtotal = 0;
-       food = "";
-       drink = "";
-       function mulFood(x) {
-         var temp = "";
-         for (var j = 0; j < x.length; j++) {
-           subtotal += Number(x[j].substring(1, 3));
-           temp += x[j].substring(4) + " ";
-         }
-         return temp;
-       }
+  function jukgajong(record) {  //67-75 BQ-BY
+    record = record[0];
+    if (record[1] == selectedRest) {
+      subtotal = 0;
+      food = "";
+      drink = "";
+      function mulFood(x) {
+        var temp = "";
+        for (var j = 0; j < x.length; j++) {
+          subtotal += Number(x[j].substring(1, 3));
+          temp += x[j].substring(4) + " ";
+        }
+        return temp;
+      }
+      for (var i = 67; i < 70; i++) {
+        if (record[i] != "") {
+          var items = record[i].toString().split(", ");
+          food += mulFood(items);
+        }
+      }
+      if (record[70] != "") {
+        var items = record[70].toString().split(", ");
+        drink += mulFood(items);
+      }
+      if (record[71] != "") {
+        food += record[71].substr(4) + "+";
+        subtotal += Number(record[71].substring(1, 3));
+        var ingred = record.slice(72, 76).filter(getItem).toString();
+        food += ingred;
+        switch (record.slice(72, 76).indexOf(ingred)) {
+            case 0: subtotal += 0; break;
+            case 1: subtotal += 1; break;
+            case 2: subtotal += 6; break;
+            case 3: subtotal += 9; break;
+          default: break;
+        }
+      }
+      listForUser.push([record[0], food, drink, subtotal]);
+      listForRest.push([food, drink]);
+    }
+  }
 
-       for (var i = 67; i < 70; i++) {
-         if (record[i] != "") {
-           var items = record[i].toString().split(", ");
-           food += mulFood(items);
-         }
-       }
-       if (record[70] != "") {
-         var items = record[70].toString().split(", ");
-         drink += mulFood(items);
-       }
-       if (record[71] != "") {
-         food += record[71].substr(4) + "+";
-         subtotal += Number(record[71].substring(1, 3));
-         var ingred = record.slice(72, 76).filter(getItem).toString();
-         food += ingred;
-         switch (record.slice(72, 76).indexOf(ingred)) {
-             case 0: subtotal += 0; break;
-             case 1: subtotal += 1; break;
-             case 2: subtotal += 6; break;
-             case 3: subtotal += 9; break;
-           default: break;
-         }
-
-       }
-       listForUser.push([record[0], food, drink, subtotal]);
-       listForRest.push([food, drink]);
-     }
-   }
+  function yatsin(record) {  //76-85 BZ-CI
+    record = record[0];
+    if (record[1] == selectedRest) {
+      subtotal = 0;
+      if (record[83] != ""){
+        soup = record[83].substring(4, 5);
+        subtotal += Number(record[83].substring(1, 3));
+        var ingred_5 = record[84].replace(/ /g, "").split(",");
+        var ingred_6 = record[85].replace(/ /g, "").split(",");
+        subtotal = subtotal + 5 * getLength(ingred_5) + 6 * getLength(ingred_6);
+        food = ingred_5.toString();
+        food += (getLength(ingred_5) > 0)? " " + ingred_6.toString() : ingred_6.toString();
+      } else {
+        var soupSpec = record.slice(76, 81).filter(getItem).toString();
+        var index = record.slice(76, 81).indexOf(soupSpec);
+        record[82] = record[82].replace(/, /g, " ");
+        var soup = activeSheet.getRange(1, index + 78).getValue().substring(8, 9) +' '+ soupSpec;
+        soup += (record[82] == "") ? "" : ' ' + record[82];
+        subtotal += Number(activeSheet.getRange(1, index + 78).getValue().substring(5, 7 ));
+        subtotal += (record[82].search("加底") != -1)? 6 : 0;
+        var ingred_5 = record[84].replace(/ /g, "").split(",");
+        var ingred_6 = record[85].replace(/ /g, "").split(",");
+        subtotal = subtotal + 5 * getLength(ingred_5) + 6 * getLength(ingred_6);
+        food = ingred_5.toString();
+        food += (getLength(ingred_5) > 0)? " " + ingred_6.toString() : ingred_6.toString();
+      }
+      listForUser.push([record[0], soup, food, subtotal]);
+      listForRest.push([soup, food]);
+    }
+  }
 
 
   function others(record) {  //2-4  D-F
@@ -341,6 +371,7 @@
         case "御壽司": restaurant = yusushi; break;
         case "家家好": restaurant = gagahou; break;
         case "粥家莊": restaurant = jukgajong; break;
+        case "一線軒": restaurant = yatsin; break;
       default: restaurant = others;
     }
     records.forEach(restaurant);
@@ -362,15 +393,17 @@
     boxForUser.setValue(Uoutput);
 
     var i = 0;
-    if (selectedRest == "雲貴川") {
+    if (selectedRest == "雲貴川" || selectedRest == "一線軒") {
       listForRest.forEach(function outputRestOrder(order) {
         i++;
         Routput = Routput + i + ". " + order.toString().replace(/,/g, " ") + "\n";
       });
       if (Routput == "") {
         Routput = "無柯打";
+      } else if (selectedRest == "雲貴川"){
+        Routput += (cucumber >= 3)? "\n小食: 青瓜, 皮蛋" : "\n小食: 皮蛋";
       } else {
-      Routput += (cucumber >= 3)? "\n小食: 青瓜, 皮蛋" : "\n小食: 皮蛋";
+        Routput += "\nTotal " + listForUser.length + "碗"
       }
     } else {
       var Foods = {};
@@ -397,8 +430,12 @@
         foodOutput += (Foods[key] == 1)? "\n" : " x" + Foods[key] + "\n";
       }
       for (var key in Drinks) {
-          drinkOutput += key;
+        drinkOutput += key;
+        if (selectedRest == "御壽司") {
+          drinkOutput += (Drinks[key] == 1)? " x1\n" : " x" + Drinks[key] + "\n";
+        } else {
           drinkOutput += (Drinks[key] == 1)? "\n" : " x" + Drinks[key] + "\n";
+        }
       }
 
       if (foodOutput == "") {

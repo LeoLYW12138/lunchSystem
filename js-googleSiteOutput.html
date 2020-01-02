@@ -23,6 +23,32 @@
         google.script.run.withSuccessHandler(useData).main(selectedRest);
       }
     }
+    $('#indeterminate-checkbox').click(function() {
+    var temp = document.getElementById("textBoxForRest").value;
+    if ($(this).is(':checked')){
+      temp += "\n *走餐具*";
+      } else {
+      temp = temp.replace("\n \*走餐具\*", "");
+      }
+      document.getElementById("textBoxForRest").value = temp;
+      M.updateTextFields();
+      $('.materialize-textarea').each(function (index) {
+        M.textareaAutoResize(this);
+      });  
+    });
+    $('#indeterminate-checkbox1').click(function() {
+    var temp = document.getElementById("textBoxForRest").value;
+    if ($(this).is(':checked')){
+      temp += "\n *走飲管*";
+      } else {
+      temp = temp.replace("\n \*走飲管\*", "");
+      }
+      document.getElementById("textBoxForRest").value = temp;
+      M.updateTextFields();
+      $('.materialize-textarea').each(function (index) {
+        M.textareaAutoResize(this);
+      });  
+    });
 
     function useData(arr) {
       document.getElementById("textBoxForRest").value = arr[0];

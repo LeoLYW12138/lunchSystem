@@ -11,6 +11,7 @@ function getPhone(rest) {
               "御壽司": "電話：2633 4429\nWhatsApp:5222 1522\t5499 1006",
               "家家好": "電話：2511 1003\nWhatsApp:5118 4369",
               "粥家莊": "電話：2712 3219\nWhatsApp:9885 4688\t9715 9991",
+              "一線軒": "電話：2330 0391\t2713 3882\nWhatsApp:5930 2783",
               "其他": "電話：\nWhatsApp:"
              };
   var phoneNum = nums[rest];
